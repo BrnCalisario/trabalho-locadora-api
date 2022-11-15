@@ -34,6 +34,17 @@ function cadastrarCliente()
     telefone = document.getElementById('telefone').value
     nascimento = document.getElementById('data-nascimento').value
 
+    //validacao do input de nome completo
+    if(!validaNome('name'))
+	{
+		return
+	}
+	//validacao do input de data nascimento
+	if(!validaNascimento('birth'))
+	{
+		return
+	}
+
     if (nascimento.length != 10) {
         return
     }
@@ -59,6 +70,21 @@ function cadastrarCliente()
     }
 
     Post(body, "clientes")
+}
+
+function validaNome(id){
+    
+    let inputNome = document.getElementById(id)
+    if (inputNome.value.trim().split(' ').length >= 2)
+    {
+        inputNome.style.border = 0
+        return true
+    }
+    else
+    {
+        inputNome.style.border = 'solid 1px red'
+        return false
+    }
 }
 
 function cadastrarFilme()
@@ -610,3 +636,6 @@ function menuShow(){
         document.querySelector('#menu').classList.add('open')
     }
 }
+
+// validações dos campos mahay
+
