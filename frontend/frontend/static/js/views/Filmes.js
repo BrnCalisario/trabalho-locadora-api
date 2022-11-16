@@ -10,8 +10,8 @@ export default class extends AbstractView {
         return `
             <div>
 
-                <h1 id="title-cad-filme">Cadastro de Filmes</h1>
-                <div id="form-filme" class="form">
+                <h1 class="titulo">Cadastro de Filmes</h1>
+                <div class="form">
 
                     <input id="nome" placeholder="Nome do Filme" type="text" autocomplete="off"/>    
                     <input id="genero" placeholder="Gênero" type="text"/>
@@ -29,8 +29,9 @@ export default class extends AbstractView {
                 </div>    
             </div>  
 
-            <div id="catalogo" class="mt-5">
-                <h1>Catálogo</h1>
+            <div class="mt-5">
+                <h1 class="titulo">Catálogo</h1>
+                <p class="texto"> 
                 <p> 
 
                     Esta é a sessão de filmes disponíveis para alugar!
