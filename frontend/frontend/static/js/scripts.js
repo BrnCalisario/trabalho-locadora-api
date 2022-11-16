@@ -27,6 +27,7 @@ var formatReal = (valor) => {
 
 var url = 'http://localhost:3000/'
 
+//CADASTRO CLIENTE
 function cadastrarCliente() 
 {
     nome = document.getElementById('nome-completo').value
@@ -34,16 +35,24 @@ function cadastrarCliente()
     telefone = document.getElementById('telefone').value
     nascimento = document.getElementById('data-nascimento').value
 
-    //validacao do input de nome completo
-    if(!validaNome('name'))
+    //validacao do prenchimento de nome completo
+    if(!validaNome('nome-completo'))
 	{
 		return
 	}
-	//validacao do input de data nascimento
-	if(!validaNascimento('birth'))
+	//validacao do preenchimento de data nascimento
+	if(!validaNascimento('data-nascimento'))
 	{
 		return
 	}
+}
+
+function cadastrarCliente() 
+{
+    nome = document.getElementById('nome-completo').value
+    cpf = document.getElementById('cpf').value.replaceAll('.', '').replace('-', '')
+    telefone = document.getElementById('telefone').value
+    nascimento = document.getElementById('data-nascimento').value
 
     if (nascimento.length != 10) {
         return
@@ -60,18 +69,8 @@ function cadastrarCliente()
         alert("Ano de nascimento inválido")
         return 
     }
-
-    let body =
-    {
-        "NomeCompleto": nome,
-        "CPF": cpf,
-        "telefone": telefone,
-        "dataNascimento": nascimento
-    }
-
-    Post(body, "clientes")
-}
-
+    
+//validação de nome completo
 function validaNome(id){
     
     let inputNome = document.getElementById(id)
@@ -85,6 +84,29 @@ function validaNome(id){
         inputNome.style.border = 'solid 1px red'
         return false
     }
+}
+
+//validação de cep e autocomplete de endereço
+function validaCep(){
+    fetch('https://viacep.com.br/ws/' + document.getElementById('cep').value + '/json')
+    .then(response => response.json())
+    .then((output) =>
+    {
+        document.getElementById('endereco').value = output.logradouro
+    })
+}
+
+//CADASTRO FILME
+
+    let body =
+    {
+        "NomeCompleto": nome,
+        "CPF": cpf,
+        "telefone": telefone,
+        "dataNascimento": nascimento
+    }
+
+    Post(body, "clientes")
 }
 
 function cadastrarFilme()
@@ -636,6 +658,3 @@ function menuShow(){
         document.querySelector('#menu').classList.add('open')
     }
 }
-
-// validações dos campos mahay
-

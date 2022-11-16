@@ -16,8 +16,8 @@
     "url": "https://github.com/BrnCalisario/trabalho-locadora-api/issues"
   },
   "homepage": "https://github.com/BrnCalisario/trabalho-locadora-api#readme",
-  "description": "",
   "dependencies": {
     "express": "^4.18.2"
-  }
+  },
+  "description": ""
 }
