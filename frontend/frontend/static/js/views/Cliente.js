@@ -58,9 +58,9 @@ export default class extends AbstractView {
                 </div>
 
                 <button onclick="cadastrarCliente()" class="btn btn-lg btn-secondary mt-4">Cadastrar</button>
-
-
+                
             </form>
+
             
             <div class="mb-5 sm-flex p-5" id="lista-dos-clientes">
                 <h1 class="titulo">Lista de Clientes</h1>

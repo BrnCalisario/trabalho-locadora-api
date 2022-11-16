@@ -13,70 +13,70 @@ namespace Locadora
 {
     public enum Estado
     {
-        Pendente  = 0,
+        Pendente = 0,
         Devolvido = 1,
-        Atrasado  = 2
+        Atrasado = 2
     }
 
     public enum Classificacao
     {
-        Livre   = 6,
-        C10     = 10,
-        C12     = 12,
-        C14     = 14,
-        C16     = 16,
-        C18     = 18,
+        Livre = 6,
+        C10 = 10,
+        C12 = 12,
+        C14 = 14,
+        C16 = 16,
+        C18 = 18,
     }
 
     public class Filme
     {
-        public long         ID              { get; set; }
-        public string?      Nome            { get; set; }
-        public string?      Genero          { get; set; } // Ação - Suspense - Comédia - Terror
-        public Classificacao?      Classificacao   { get; set; } // L - 10 - 12 - 14 - 16 - 18
-        public DateTime     DataLancamento  { get; set; } 
-        public DateTime?    DataAdicionado  { get; set; }
-        public float?       Preco           { get; set; } 
-        public bool         IsAlugado       { get; set; } = false;
+        public long ID { get; set; }
+        public string? Nome { get; set; }
+        public string? Genero { get; set; } // Ação - Suspense - Comédia - Terror
+        public Classificacao? Classificacao { get; set; } // L - 10 - 12 - 14 - 16 - 18
+        public DateTime DataLancamento { get; set; }
+        public DateTime? DataAdicionado { get; set; }
+        public float? Preco { get; set; }
+        public bool IsAlugado { get; set; } = false;
     }
 
     public class Cliente
     {
-        public long         ID              { get; set; }
-        public string?      NomeCompleto    { get; set; }
-        public string?      CPF             { get; set; }
-        public string?      telefone        { get; set; }
-        public DateTime     dataNascimento  { get; set; }
-        
+        public long ID { get; set; }
+        public string? NomeCompleto { get; set; }
+        public string? CPF { get; set; }
+        public string? telefone { get; set; }
+        public DateTime dataNascimento { get; set; }
+
         public int getAge()
         {
-            DateTime Now = DateTime.Now;  
-            return new DateTime(DateTime.Now.Subtract(dataNascimento).Ticks).Year - 1;  
-        } 
-        
+            DateTime Now = DateTime.Now;
+            return new DateTime(DateTime.Now.Subtract(dataNascimento).Ticks).Year - 1;
+        }
+
     }
 
     public class Aluguel
     {
-        public long         ID              { get; set; }
-        public long         ClienteID       { get; set; }
-        public long         FilmeID         { get; set; }
-        public DateTime?    DataAluguel     { get; set; }
-        public DateTime     DataLimite      { get; set; }
-        public Estado       EstadoDevolução { get; set; }
-        
+        public long ID { get; set; }
+        public long ClienteID { get; set; }
+        public long FilmeID { get; set; }
+        public DateTime? DataAluguel { get; set; }
+        public DateTime DataLimite { get; set; }
+        public Estado EstadoDevolução { get; set; }
 
-        public virtual Filme    FilmeAlugado    { get; set; }
-        public virtual Cliente  ClienteAlugador { get; set; }
+
+        public virtual Filme FilmeAlugado { get; set; }
+        public virtual Cliente ClienteAlugador { get; set; }
     }
 
     public class Database : DbContext
     {
-        public Database(DbContextOptions options) : base(options) {}
-        public DbSet<Filme>   Filmes        { get; set;}    = null!;
-        public DbSet<Cliente> Clientes      { get; set;}    = null!;
-        public DbSet<Aluguel> Alugueis      { get; set;}    = null!;
-        
+        public Database(DbContextOptions options) : base(options) { }
+        public DbSet<Filme> Filmes { get; set; } = null!;
+        public DbSet<Cliente> Clientes { get; set; } = null!;
+        public DbSet<Aluguel> Alugueis { get; set; } = null!;
+
         // protected override void OnModelCreating(ModelBuilder modelBuilder)
         // {
         //     modelBuilder.Entity<Filme>()
@@ -103,21 +103,21 @@ namespace Locadora
             //////////Filmes
             ////////////////////////////////////////////////////////////////
 
-            app.MapGet("/filmes", (Database database) => 
+            app.MapGet("/filmes", (Database database) =>
             {
                 return database.Filmes.ToList();
             });
 
             app.MapPost("/filmes", (Database database, Filme filme) =>
             {
-                if(database.Filmes.Where(f => f.Nome == filme.Nome).Count() > 0)
+                if (database.Filmes.Where(f => f.Nome == filme.Nome).Count() > 0)
                 {
                     return Results.Problem("Nome de filme já cadastrado!");
                 }
 
                 filme.DataAdicionado = DateTime.Now;
 
-                filme.Preco = 5.50f + (int) filme.Classificacao;
+                filme.Preco = 5.50f + (int)filme.Classificacao;
 
                 database.Filmes.Add(filme);
                 database.SaveChanges();
@@ -128,12 +128,35 @@ namespace Locadora
 
             app.MapGet("/filmes/disponiveis", (Database database) => database.Filmes.Where(f => !f.IsAlugado));
 
+            app.MapPut("/filmes/{id}", (Database database, Filme atualizado, long id) =>
+            {
+                var filme = database.Filmes.Find(id);
+
+                if (filme == null)
+                    return Results.NotFound();
+
+                if (filme.Nome != atualizado.Nome)
+                    if (database.Filmes.Where(f => f.Nome == atualizado.Nome).Count() > 0)
+                        return Results.Problem("Nome de filme já cadastrado!");
+
+                if (null != atualizado.Nome) filme.Nome = atualizado.Nome;
+                if (null != atualizado.Genero) filme.Genero = atualizado.Genero;
+                if (null != atualizado.Classificacao) filme.Classificacao = atualizado.Classificacao;
+                if (null != atualizado.DataLancamento) filme.DataLancamento = atualizado.DataLancamento;
+
+
+                filme.Preco = 5.50f + (int)atualizado.Classificacao;
+
+                database.SaveChanges();
+                return Results.Ok();
+            });
+
             app.MapDelete("/filmes/{id}", (Database database, long id) =>
             {
                 var filme = database.Filmes.Find(id);
-                if(filme == null)
+                if (filme == null)
                     return Results.NotFound();
-                
+
                 database.Remove(filme);
                 database.SaveChanges();
                 return Results.Ok();
@@ -143,14 +166,14 @@ namespace Locadora
             //////////Clientes
             ////////////////////////////////////////////////////////////////
 
-            app.MapGet("/clientes", (Database database) => 
+            app.MapGet("/clientes", (Database database) =>
             {
                 return database.Clientes.ToList();
             });
 
             app.MapPost("/clientes", (Database database, Cliente cliente) =>
             {
-                if(database.Clientes.Where(c => c.CPF == cliente.CPF).Count() > 0)
+                if (database.Clientes.Where(c => c.CPF == cliente.CPF).Count() > 0)
                 {
                     return Results.Problem("CPF já consta no banco de dados!");
                 }
@@ -161,19 +184,19 @@ namespace Locadora
 
             app.MapGet("/clientes/{id}", (Database database, long id) => database.Clientes.Find(id));
 
-            app.MapPut("/clientes/{id}", (Database database, Cliente atualizado, long id) => 
+            app.MapPut("/clientes/{id}", (Database database, Cliente atualizado, long id) =>
             {
                 var cliente = database.Clientes.Find(id);
 
-                if(cliente == null)
+                if (cliente == null)
                     return Results.NotFound();
 
-                if(null != atualizado.NomeCompleto) cliente.NomeCompleto = atualizado.NomeCompleto;
-                if(null != atualizado.CPF) cliente.CPF = atualizado.CPF;
-                if(null != atualizado.telefone) cliente.telefone = atualizado.telefone;
-                if(null != atualizado.dataNascimento) cliente.dataNascimento = atualizado.dataNascimento;
+                if (null != atualizado.NomeCompleto) cliente.NomeCompleto = atualizado.NomeCompleto;
+                if (null != atualizado.CPF) cliente.CPF = atualizado.CPF;
+                if (null != atualizado.telefone) cliente.telefone = atualizado.telefone;
+                if (null != atualizado.dataNascimento) cliente.dataNascimento = atualizado.dataNascimento;
 
-    
+
                 database.SaveChanges();
                 return Results.Ok();
             });
@@ -182,9 +205,9 @@ namespace Locadora
             app.MapDelete("/clientes/{id}", (Database database, long id) =>
             {
                 var cliente = database.Clientes.Find(id);
-                if(cliente == null)
+                if (cliente == null)
                     return Results.NotFound();
-                
+
                 database.Remove(cliente);
                 database.SaveChanges();
                 return Results.Ok();
@@ -195,32 +218,32 @@ namespace Locadora
             //////////Alugueis
             ////////////////////////////////////////////////////////////////
 
-            app.MapGet("/alugueis", (Database database) => 
+            app.MapGet("/alugueis", (Database database) =>
             {
                 return database.Alugueis.ToList();
             });
 
             app.MapPost("/alugueis", (Database database, Aluguel aluguel) =>
             {
-                if(!Enum.IsDefined(aluguel.EstadoDevolução))
+                if (!Enum.IsDefined(aluguel.EstadoDevolução))
                 {
                     return Results.Problem("Estado de devolução inválido");
                 }
 
                 var clienteRelacionado = database.Clientes.Find(aluguel.ClienteID);
                 var filmeRelacionado = database.Filmes.Find(aluguel.FilmeID);
-                
+
                 if (clienteRelacionado != null && filmeRelacionado != null)
-                    if(clienteRelacionado.getAge() < 18 && filmeRelacionado.Classificacao == Classificacao.C18)
+                    if (clienteRelacionado.getAge() < 18 && filmeRelacionado.Classificacao == Classificacao.C18)
                         return Results.Problem("Classificação de filme não indicada para o cliente");
 
-                    // aluguel.FilmeAlugado = filmeRelacionado;
-                    // aluguel.ClienteAlugador = clienteRelacionado;
-                
+                // aluguel.FilmeAlugado = filmeRelacionado;
+                // aluguel.ClienteAlugador = clienteRelacionado;
+
                 database.Filmes.Find(aluguel.FilmeID).IsAlugado = true;
 
 
-            
+
                 aluguel.DataAluguel = DateTime.Now;
                 aluguel.DataLimite = new DateTime(DateTime.Now.Ticks).AddDays(7);
                 aluguel.EstadoDevolução = 0;
@@ -233,8 +256,12 @@ namespace Locadora
 
             app.MapGet("/alugueis/cliente/{id}", (Database database, long id) => database.Alugueis.Where(aluguel => aluguel.ClienteID == id));
 
-            app.MapPut("/alugueis/devolver/{id}", (Database database, long id) => {
-                database.Alugueis.Find(id).EstadoDevolução = Estado.Devolvido;
+            app.MapPut("/alugueis/devolver/{id}", (Database database, long id) =>
+            {
+
+                var aluguelSelecionado = database.Alugueis.Find(id);
+                aluguelSelecionado.EstadoDevolução = Estado.Devolvido;
+                database.Filmes.Find(aluguelSelecionado.FilmeID).IsAlugado = false;
                 database.SaveChanges();
                 return Results.Ok();
             });
@@ -242,9 +269,9 @@ namespace Locadora
             app.MapDelete("/alugueis/{id}", (Database database, long id) =>
             {
                 var aluguel = database.Alugueis.Find(id);
-                if(aluguel == null)
+                if (aluguel == null)
                     return Results.NotFound();
-                
+
                 database.Remove(aluguel);
                 database.SaveChanges();
                 return Results.Ok();
@@ -253,5 +280,5 @@ namespace Locadora
             app.Run("http://localhost:3000");
         }
     }
-    
+
 }
