@@ -14,8 +14,7 @@ export default class extends AbstractView {
                     <input id="nome-completo" placeholder="Nome Completo" type="text"/>    
                     <input id="cpf" placeholder="CPF" type="text" autocomplete="off" maxlength="14" onkeypress="mask_cpf()"/>
                     <input id="telefone" placeholder="Telefone" type="text" autocomplete="off" maxlength="13" onkeypress="mask_phone()"/>    
-                    <input id="data-nascimento" placeholder="Data de Nascimento" type="date"/>  
-                    <button onclick="cadastrarCliente()" class="btn btn-success">Cadastrar</button></div> 
+                    <input id="data-nascimento" placeholder="Data de Nascimento" type="date"/><button onclick="cadastrarCliente()" class="btn btn-success">Cadastrar</button></div> 
             </div>
             
             <div id="lista-dos-clientes">

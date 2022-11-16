@@ -150,8 +150,6 @@ async function Put(body, type)
         console.log(error)
         alert("Não foi possível editar")
     })
-
-    modoCadastroCliente()
 }
 
 const getClassificacao = (c) => {
@@ -173,7 +171,24 @@ const getClassificacao = (c) => {
     }
 }
 
-function listarFilmes()
+function getIndexClass(c) {
+    switch(c) {
+        case 6:
+            return 0
+        case 10:
+            return 1
+        case 12:
+            return 2
+        case 14:
+            return 3
+        case 16:
+            return 4
+        case 18:
+            return 5
+    }
+}
+
+async function listarFilmes()
 {
     fetch(url + 'filmes')
     .then(response => response.json())
@@ -191,8 +206,7 @@ function listarFilmes()
             console.log(filme)
             // Div com todas informações do item filme
             let divFilme = document.createElement('div')
-            divFilme.setAttribute('class', 'border rounded p-2 m-2')
-
+            divFilme.setAttribute('class', 'border border-dark rounded my-2 p-2 mx-2 bg-dark text-light')
 
             let divNome = document.createElement('p')
             divNome.innerHTML = "Nome: " + filme.nome
@@ -219,25 +233,40 @@ function listarFilmes()
             buttonDiv.setAttribute('class', 'd-flex flex-row-reverse')
 
             let buttonDelete = document.createElement('button')
-            buttonDelete.setAttribute('class', 'btn btn-danger')
+            buttonDelete.setAttribute('class', 'btn btn-outline-danger ms-2')
             buttonDelete.innerHTML = "Excluir"
             buttonDiv.appendChild(buttonDelete)
 
+            buttonDelete.onclick = async () => {
+
+                if(window.confirm("Tem certeza que deseja remover " + filme.nome + " ?"))
+                {
+                    await deletar("filmes/", filme.id)
+                    
+                }
+                listarFilmes()
+            }
+
+
             let buttonEdit = document.createElement('button')
-            buttonEdit.setAttribute('class', 'btn btn-warning')
+            buttonEdit.setAttribute('class', 'btn btn-outline-warning')
             buttonEdit.innerHTML = "Editar"
+
+            buttonEdit.onclick = () => {
+                modoEditarFilme(filme.id)
+            }
+
+
             buttonDiv.appendChild(buttonEdit)
 
             divFilme.appendChild(buttonDiv)
-
-
             listaFilmes.appendChild(divFilme)
         }
         
     })
 }
 
-function listarClientes()
+async function listarClientes()
 {
     fetch(url + 'clientes')
     .then(response => response.json())
@@ -289,12 +318,13 @@ function listarClientes()
             deleteButton.setAttribute('class', 'btn btn-outline-danger ms-2')
             deleteButton.innerHTML = "Deletar"
 
-            deleteButton.onclick = () => {
+            deleteButton.onclick = async () => {
 
                 if (window.confirm("Tem certeza que deseja remover " + cliente.nomeCompleto + " do sistema ?")) {
-                    deletarCliente(cliente.id)
+                    await deletar("clientes/",cliente.id)
+                    
                 }
-
+                listarClientes()
 
             }
             divButtons.appendChild(deleteButton)
@@ -377,9 +407,9 @@ async function listarAlugueis()
 
 }
 
-function deletarCliente(id)
+async function deletar(type, id)
 {      
-    fetch(url + 'clientes/' + id,
+    fetch(url + type + id,
     {
         'method': 'DELETE',
         'redirect': 'follow'
@@ -400,14 +430,14 @@ function deletarCliente(id)
     })
     .then((output) => 
     {
-        listarClientes()
+        // listarClientes()
         console.log(output)
-        alert('Cliente removido')
+        alert('Deletado com sucesso')
     })
     .catch((error) =>
     {
         console.log(error)
-        alert('Não foi possível remover o cliente')
+        alert('Não foi possível remover')
     })
 }
 
@@ -455,7 +485,6 @@ async function getClientById(id)
     const res = await req.json()
     return res
 }
-
 
 function getEstado(en)
 {
@@ -526,10 +555,10 @@ async function modoEditarCliente(id)
     buttonEdit.setAttribute('class', 'btn btn-warning')
     buttonEdit.innerHTML = "Salvar Alterações"
     buttonEdit.onclick = () => {
-        nome = document.getElementById('nome-completo').value
-        cpf = document.getElementById('cpf').value.replaceAll('.', '').replace('-', '')
-        telefone = document.getElementById('telefone').value
-        nascimento = document.getElementById('data-nascimento').value
+        let nome = document.getElementById('nome-completo').value
+        let cpf = document.getElementById('cpf').value.replaceAll('.', '').replace('-', '')
+        let telefone = document.getElementById('telefone').value
+        let nascimento = document.getElementById('data-nascimento').value
     
         if (nascimento.length != 10) {
             return
@@ -587,7 +616,7 @@ async function modoCadastroCliente()
 
     let buttonCadastro = document.createElement('button')
     buttonCadastro.setAttribute('class', 'btn btn-success')
-    buttonCadastro.onclick = cadastrarCliente
+    buttonCadastro.onclick = this.cadastrarCliente
     buttonCadastro.innerHTML = "Cadastrar"
 
     document.getElementById('nome-completo').value = ""
@@ -601,4 +630,78 @@ async function modoCadastroCliente()
     let listaClientes = document.getElementById('lista-clientes')
     while(listaClientes.firstChild)
         listaClientes.removeChild(listaClientes.firstChild)
+}
+
+async function modoEditarFilme(id)
+{
+    document.getElementById('title-cad-filme').innerHTML = "Edição de Filme"
+
+    let formFilme = document.getElementById('form-filme')
+    formFilme.removeChild(formFilme.lastElementChild)
+
+    document.getElementById('catalogo').setAttribute('class', 'escondido')
+
+    let buttonEdit = document.createElement('button')
+    buttonEdit.setAttribute('class', 'btn btn-warning')
+    buttonEdit.innerHTML = "Salvar Alterações"
+
+    buttonEdit.onclick = () => {
+
+        let body = 
+        {
+            "Nome": document.getElementById('nome').value,
+            "Genero": document.getElementById('genero').value,
+            "Classificacao": parseInt(document.getElementById('classificacao').value),
+            "DataLancamento": document.getElementById('data-lancamento').value
+        }
+
+        this.Put(body, "filmes/" + id)
+
+        modoCadastroFilme()
+    }
+
+
+
+    let buttonCancelEdit = document.createElement('button')
+    buttonCancelEdit.setAttribute('class', 'btn btn-danger')
+    buttonCancelEdit.innerHTML = "Cancelar"
+
+    buttonCancelEdit.onclick = modoCadastroFilme
+
+    formFilme.appendChild(buttonEdit)
+    formFilme.appendChild(buttonCancelEdit)
+
+    let filmeSelecionado = await this.getFilmeById(id)
+
+    document.getElementById('nome').value = filmeSelecionado.nome
+    document.getElementById('genero').value = filmeSelecionado.genero
+    document.getElementById('classificacao').selectedIndex = getIndexClass(filmeSelecionado.classificacao)
+    document.getElementById('data-lancamento').value = filmeSelecionado.dataLancamento.substring(0, 10)
+
+}
+
+async function modoCadastroFilme()
+{
+    document.getElementById('title-cad-filme').innerHTML = "Cadastro de Filmes"
+
+    let formFilme = document.getElementById('form-filme')
+    formFilme.removeChild(formFilme.lastChild)
+    formFilme.removeChild(formFilme.lastChild)
+
+    let buttonCadastro = document.createElement('button')
+    buttonCadastro.setAttribute('class', 'btn btn-success')
+    buttonCadastro.onclick = this.cadastrarFilme
+    buttonCadastro.innerHTML = "Cadastrar"
+
+    document.getElementById('nome').value = ""
+    document.getElementById('genero').value = ""
+    document.getElementById('classificacao').selectedIndex = 0
+    document.getElementById('data-lancamento').value = "" 
+
+    document.getElementById('catalogo').setAttribute('class', '')
+    formFilme.appendChild(buttonCadastro)
+
+    let listFilmes = document.getElementById('lista-filmes')
+    while(listFilmes.firstChild)
+        listFilmes.removeChild(listFilmes.firstChild)
 }
