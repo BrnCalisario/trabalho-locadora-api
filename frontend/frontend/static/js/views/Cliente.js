@@ -10,7 +10,8 @@ export default class extends AbstractView {
         return `
         
             <form class="mb-5 sm-flex p-5">
-                <h1 id="title-cad-cliente" class="titulo">Cadastro de Clientes</h1>
+                <h1 class="titulo">Cadastro de Clientes</h1>
+                <div class="form">
                 
                 <div class="form-row form" id="cliente-form">
                     <div class="form-group col-md-6 px-1">
