@@ -27,6 +27,26 @@ var formatReal = (valor) => {
 
 var url = 'http://localhost:3000/'
 
+//CADASTRO CLIENTE
+function cadastrarCliente() 
+{
+    nome = document.getElementById('nome-completo').value
+    cpf = document.getElementById('cpf').value.replaceAll('.', '').replace('-', '')
+    telefone = document.getElementById('telefone').value
+    nascimento = document.getElementById('data-nascimento').value
+
+    //validacao do prenchimento de nome completo
+    if(!validaNome('nome-completo'))
+	{
+		return
+	}
+	//validacao do preenchimento de data nascimento
+	if(!validaNascimento('data-nascimento'))
+	{
+		return
+	}
+}
+
 function cadastrarCliente() 
 {
     nome = document.getElementById('nome-completo').value
@@ -49,7 +69,7 @@ function cadastrarCliente()
         alert("Ano de nascimento inválido")
         return 
     }
-
+    
     let body =
     {
         "NomeCompleto": nome,
@@ -60,6 +80,35 @@ function cadastrarCliente()
 
     Post(body, "clientes")
 }
+
+//validação de nome completo
+function validaNome(id){
+    
+    let inputNome = document.getElementById(id)
+    if (inputNome.value.trim().split(' ').length >= 2)
+    {
+        inputNome.style.border = 0
+        return true
+    }
+    else
+    {
+        inputNome.style.border = 'solid 1px red'
+        return false
+    }
+}
+
+//validação de cep e autocomplete de endereço
+function validaCep(){
+    fetch('https://viacep.com.br/ws/' + document.getElementById('cep').value + '/json')
+    .then(response => response.json())
+    .then((output) =>
+    {
+        document.getElementById('endereco').value = output.logradouro
+    })
+}
+
+//CADASTRO FILME
+
 
 function cadastrarFilme()
 {
@@ -632,6 +681,15 @@ async function modoCadastroCliente()
         listaClientes.removeChild(listaClientes.firstChild)
 }
 
+
+function menuShow(){
+    if(document.querySelector('#menu').classList.contains('open')){
+        document.querySelector('#menu').classList.remove('open')
+    } else {
+        document.querySelector('#menu').classList.add('open')
+    }
+}
+
 async function modoEditarFilme(id)
 {
     document.getElementById('title-cad-filme').innerHTML = "Edição de Filme"
@@ -704,4 +762,5 @@ async function modoCadastroFilme()
     let listFilmes = document.getElementById('lista-filmes')
     while(listFilmes.firstChild)
         listFilmes.removeChild(listFilmes.firstChild)
+
 }
