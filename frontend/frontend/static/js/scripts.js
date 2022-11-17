@@ -239,15 +239,62 @@ function getIndexClass(c) {
 
 async function listarFilmes()
 {
+
+    let listaFilmes = document.getElementById('lista-filmes')
+
+    let divFilme = document.createElement('div')
+    divFilme.setAttribute('class', 'border border-dark rounded my-2 p-2 mx-2 bg-dark text-light')
+
+    let divNome = document.createElement('p')
+    divNome.innerHTML = "Nome: O Farol"
+    divFilme.appendChild(divNome)
+
+    let divGenero = document.createElement('p')
+    divGenero.innerHTML = "Gênero: Suspense"
+    divFilme.appendChild(divGenero)
+
+    let divClassificacao = document.createElement('p')
+    divClassificacao.innerHTML = "Classificação: +18"
+    divFilme.appendChild(divClassificacao)
+
+    let divDataLancamento = document.createElement('p')
+    divDataLancamento.innerHTML = "Data de Lançamento: 19/09/2019"
+    divFilme.appendChild(divDataLancamento)
+
+    let divPreco = document.createElement('p')
+    divPreco.innerHTML = "Preço: 18,90"
+    divFilme.appendChild(divPreco)
+
+    let buttonDiv = document.createElement('div')
+    buttonDiv.setAttribute('class', 'd-flex flex-row-reverse')
+
+    let buttonDelete = document.createElement('button')
+    buttonDelete.setAttribute('class', 'btn btn-outline-danger ms-2')
+    buttonDelete.innerHTML = "Excluir"
+    buttonDiv.appendChild(buttonDelete)
+
+    let buttonEdit = document.createElement('button')
+    buttonEdit.setAttribute('class', 'btn btn-outline-warning')
+    buttonEdit.innerHTML = "Editar"
+
+    
+    buttonDiv.appendChild(buttonEdit)
+
+    divFilme.appendChild(buttonDiv)
+    listaFilmes.appendChild(divFilme)
+
+
+
     fetch(url + 'filmes')
     .then(response => response.json())
     .then((filmes) => 
     {
-        let listaFilmes = document.getElementById('lista-filmes')
+        
 
         console.log(filmes)
         while(listaFilmes.firstChild)
             listaFilmes.removeChild(listaFilmes.firstChild)
+        
 
         for(let filme of filmes)
         {
@@ -317,6 +364,39 @@ async function listarFilmes()
 
 async function listarClientes()
 {
+
+    let listaClientes = document.getElementById('lista-clientes')
+    let divCliente = document.createElement('div')
+    divCliente.setAttribute('class', 'border border-dark rounded my-2 p-2 mx-2 bg-dark text-light')
+
+    let divNome = document.createElement('p')
+    divNome.setAttribute('class', 'ms-2 mt-2')
+    divNome.innerHTML = "Nome: Sergio Nogueira"
+    divCliente.appendChild(divNome)
+
+    let divTel = document.createElement('p')
+    divTel.setAttribute('class', 'ms-2 mt-2')
+    divTel.innerHTML = "Telefone: 41 99999-9999"
+    divCliente.appendChild(divTel)
+
+    let divButtons = document.createElement('div')
+    divButtons.setAttribute('class', 'd-flex flex-row-reverse')
+
+    let editButton = document.createElement('button')
+    editButton.setAttribute('class', 'btn btn-outline-warning')
+    editButton.innerHTML = "Editar"
+
+    let deleteButton = document.createElement('button')
+    deleteButton.setAttribute('class', 'btn btn-outline-danger ms-2')
+    deleteButton.innerHTML = "Deletar"
+
+    divButtons.appendChild(deleteButton)
+    divButtons.appendChild(editButton)
+
+    divCliente.appendChild(divButtons)
+
+    listaClientes.appendChild(divCliente)
+
     fetch(url + 'clientes')
     .then(response => response.json())
     .then((clientes) =>
